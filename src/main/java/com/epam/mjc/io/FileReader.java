@@ -9,35 +9,32 @@ public class FileReader {
         Profile profile = new Profile();
         try (FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath())){
             int ch;
-            StringBuilder key= new StringBuilder();
-            StringBuilder value = new StringBuilder();
+            StringBuilder line = new StringBuilder();
 
             while ((ch=fileInputStream.read())!=-1){
                 char c = (char)ch;
+                if (c == '\n'){
+                    String[] strings = line.toString().split(":");
+                    String key = strings[0].trim();
+                    String value = strings[1].trim();
 
-                if (key.toString().equals("Name") || key.toString().equals("Age") || key.toString().equals("Email") || key.toString().equals("Phone")) {
-                    if (c =='\n'){
-                        switch (key.toString()) {
-                            case "Name":
-                                profile.setName(value.toString());
-                                break;
-                            case "Age":
-                                profile.setAge(Integer.parseInt(value.toString()));
-                                break;
-                            case "Email":
-                                profile.setEmail(value.toString());
-                                break;
-                            default:
-                                profile.setPhone(Long.parseLong(value.toString()));
-                                break;
-                        }
-                        key.delete(0,key.length());
-                        value.delete(0,value.length());
-                    } else if (c != ':' && c != ' ' && c != '\r'){
-                        value.append(c);
+                    switch (key) {
+                        case "Name":
+                            profile.setName(value);
+                            break;
+                        case "Age":
+                            profile.setAge(Integer.parseInt(value));
+                            break;
+                        case "Email":
+                            profile.setEmail(value);
+                            break;
+                        default:
+                            profile.setPhone(Long.parseLong(value));
+                            break;
                     }
+                    line.delete(0, line.length());
                 } else {
-                    key.append(c);
+                    line.append(c);
                 }
             }
         } catch (FileNotFoundException e) {
